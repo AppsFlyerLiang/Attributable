@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttersample/screens/track_event.dart';
 import 'package:fluttersample/widgets/image_background_container.dart';
 
 import '../app_config.dart';
+import 'conversion.dart';
+import 'other_feature.dart';
 
 class Home extends StatefulWidget {
   Home({Key key}) : super(key: key);
@@ -15,6 +19,15 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    final List<Widget> _tabContents = [
+      Conversion(),
+      TrackEvent(),
+      OtherFeature()
+    ];
     return ImageBackgroundContainer(
       child: Scaffold(
         appBar: AppBar(
@@ -36,10 +49,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             },
             items: [
               BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                title: Text("Home"),
-              ),
-              BottomNavigationBarItem(
                 icon: Icon(Icons.cloud_download),
                 title: Text("Conversion"),
               ),
@@ -53,17 +62,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               ),
             ]
         ),
-        extendBodyBehindAppBar: true,
-        extendBody: true,
-        body: ListView(
-          children: [
-            Card(
-                child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(8),
-                    child: Text("Advertiser Id: ${AppConfig.advertisingId}"))),
-          ],
-        ),
+        body: _tabContents[_currentTabIndex],
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttersample/models/app_data.dart';
 import 'package:fluttersample/widgets/image_background_container.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +14,10 @@ class _SplashState extends State<Splash> {
   Widget build(BuildContext context) {
     AppData appData = Provider.of<AppData>(context);
     print("[Splash] build");
-
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return ImageBackgroundContainer(
       child: Scaffold(
         appBar: AppBar(

@@ -17,7 +17,7 @@ enum InitResult {
   askPrivacyPolicy,
   home,
   splash,
-  deepLink,
+  deferredDeepLink,
 }
 
 class AppConfig {
@@ -37,13 +37,13 @@ class AppConfig {
         prefs.setBool("isPrivacyPolicyAggreed", agreed));
   }
 
-  static Future<InitResult> initLocal() async {
+  static Future<InitResult> initBeforeAgreement() async {
     appData.privacyPolicyAgreed = await isPrivacyPolicyAgreed;
     return appData.privacyPolicyAgreed? InitResult.splash : InitResult.askPrivacyPolicy;
   }
 //  static FirebaseMessaging firebaseMessage = FirebaseMessaging();
 
-  static Future<InitResult> initRemote() async {
+  static Future<InitResult> initAfterAgreement() async {
     InitResult result;
     print("[initAfterAgree]");
     print("[retrieveDeviceId  >>>>>>>>>>>> ]");
@@ -102,12 +102,15 @@ class AppConfig {
     if ("OK" == response["status"]) {
       print("[appsflyerSdk.initSdk] status ok");
       if (!appData.getConversionDataDone) {
-        var cvData = await appsflyerSdk.conversionDataStream.asBroadcastStream().first;
-        print("[cvData] get Conversion Data $cvData");
+        Map<dynamic, dynamic> cvResponse = await appsflyerSdk.conversionDataStream.asBroadcastStream().first;
+        print("[cvData] get Conversion Data $cvResponse");
+        appData.conversionResponse = ConversionResponse.fromJson(cvResponse);
+        Map<String, dynamic> cvData = appData.conversionResponse.data;
         if (cvData["is_first_launch"] ?? false) {
           if (cvData["af_adset"] == "defer") {
-            appData.conversionData = cvData;
-            return InitResult.deepLink;
+            return InitResult.deferredDeepLink;
+          } else if (cvData["af_dp"]?.toString()?.startsWith("attributable://") ?? false) {
+            return InitResult.deferredDeepLink;
           }
         }
       } else {
@@ -120,5 +123,9 @@ class AppConfig {
       });
     }
     return null;
+  }
+
+  static void _handleDeepLink(Map<dynamic, dynamic> cvData) {
+    print("[_handleDeepLink] Conversion Data $cvData");
   }
 }

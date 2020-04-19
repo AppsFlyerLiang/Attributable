@@ -10,7 +10,7 @@ class GradientButton extends StatelessWidget {
   GradientButton({
     this.buttonText,
     this.onPressed,
-    this.width = 80,
+    this.width,
     this.height = 50,
     this.margin,
     this.decoration,
@@ -33,7 +33,7 @@ class GradientButton extends StatelessWidget {
     var accentColor = Theme.of(context).accentColor;
     var accentColorDark = buildAccentColorDark(accentColor);
     return Container(
-      width: width ?? 80,
+      width: width,
       height: height ?? 50,
       margin: margin,
 //      constraints: const BoxConstraints(minWidth: 50.0, minHeight: 50.0),

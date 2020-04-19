@@ -104,27 +104,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_appavailability:
-    dependency: "direct main"
-    description:
-      name: flutter_appavailability
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.21"
-  flutter_package_manager:
-    dependency: "direct main"
-    description:
-      name: flutter_package_manager
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.0"
-  flutter_phoenix:
-    dependency: "direct main"
-    description:
-      name: flutter_phoenix
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -184,6 +163,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.0.4"
+  package_info:
+    dependency: "direct main"
+    description:
+      name: package_info
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.0+16"
   path:
     dependency: transitive
     description:
