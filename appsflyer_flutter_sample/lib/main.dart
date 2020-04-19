@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'MyApp.dart';
-import 'screens/start.dart';
+import 'app_config.dart';
+import 'screens/my_app.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  var result = await MyApp.init();
-  print(result);
-  runApp(Start(result));
+main() async {
+  runApp(MyApp());
 }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fluttersample/widgets/gradient_button.dart';
 import 'package:fluttersample/widgets/image_background_container.dart';
 
-import '../MyApp.dart';
+import '../app_config.dart';
 
 class Home extends StatefulWidget {
   Home({Key key}) : super(key: key);
@@ -17,20 +16,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return ImageBackgroundContainer(
-      image: Image.asset("assets/images/003.jpg", fit: BoxFit.cover,),
       child: Scaffold(
-        backgroundColor: Colors.transparent,
         appBar: AppBar(
           centerTitle: true,
           title: Image.asset(
             "assets/images/af_logo.png", height: 28, fit: BoxFit.fitHeight,),
-          actions: [
-            Icon(Icons.menu),
-          ],
         ),
         bottomNavigationBar: BottomNavigationBar(
-
-          type: BottomNavigationBarType.fixed,
+            type: BottomNavigationBarType.fixed,
             unselectedItemColor: Colors.white24,
             selectedItemColor: Colors.white,
             backgroundColor: Colors.black38,
@@ -48,7 +41,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.cloud_download),
-                  title: Text("Conversion"),
+                title: Text("Conversion"),
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.send),
@@ -58,7 +51,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 icon: Icon(Icons.perm_device_information),
                 title: Text("Deep Link"),
               ),
-            ]),
+            ]
+        ),
         extendBodyBehindAppBar: true,
         extendBody: true,
         body: ListView(
@@ -67,7 +61,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 child: Container(
                     width: double.infinity,
                     padding: EdgeInsets.all(8),
-                    child: Text("Advertiser Id: ${MyApp.advertisingId}"))),
+                    child: Text("Advertiser Id: ${AppConfig.advertisingId}"))),
           ],
         ),
       ),

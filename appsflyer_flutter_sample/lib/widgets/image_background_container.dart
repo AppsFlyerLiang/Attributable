@@ -5,7 +5,7 @@ class ImageBackgroundContainer extends StatelessWidget {
   final Widget child;
   ImageBackgroundContainer({
     Key key,
-    this.image,
+    this.image = const Image(image: AssetImage("assets/images/003.jpg"), fit: BoxFit.cover,),
     this.child,
   })
       : assert(image != null),
