@@ -59,4 +59,7 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.appsflyer:af-android-sdk:5.1.1'
+    implementation "com.google.firebase:firebase-messaging:20.1.5"
 }
+apply plugin: 'com.google.gms.google-services'

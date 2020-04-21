@@ -1,7 +1,6 @@
-import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttersample/app_config.dart';
-import 'package:fluttersample/widgets/gradient_button.dart';
+import '../app_config.dart';
+import '../widgets/gradient_button.dart';
 
 class TrackEvent extends StatefulWidget {
   TrackEvent({Key key}) : super(key: key);
@@ -68,9 +67,9 @@ class _TrackEventState extends State<TrackEvent> {
                     text: TextSpan(
                       children: [
                         TextSpan(text: "Event name: "),
-                        TextSpan(text: e.eventName, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).accentColor)),
+                        TextSpan(text: e.eventName, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColorLight)),
                         TextSpan(text: "\nEvent values:\n"),
-                        TextSpan(text: e.eventValues.toString(), style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).accentColor)),
+                        TextSpan(text: e.eventValues.toString(), style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColorLight)),
                       ]
                     ),
                   ),

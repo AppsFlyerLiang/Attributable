@@ -20,54 +20,59 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
 
   @override
   Widget build(BuildContext context) {
-    return ImageBackgroundContainer(
-      image: Image.asset("assets/images/003.jpg", fit: BoxFit.cover,),
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Image.asset(
-            "assets/images/af_logo.png", height: 28, fit: BoxFit.fitHeight,),
-        ),
-        body: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 82),
-              child: WebView(
-                initialUrl: 'about:blank',
-                onWebViewCreated: (WebViewController webViewController) {
-                  _controller = webViewController;
-                  _loadHtmlFromAssets();
-                },
-              ),
+    return WillPopScope(
+      onWillPop: () => Future.value(false),
+      child: ImageBackgroundContainer(
+        image: Image.asset("assets/images/003.jpg", fit: BoxFit.cover,),
+        child: Material(
+          child: Scaffold(
+            appBar: AppBar(
+              centerTitle: true,
+              title: Image.asset(
+                "assets/images/af_logo.png", height: 28, fit: BoxFit.fitHeight,),
             ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Row(
-                  children: [
-                    Expanded(
-                      child: GradientButton(
-                        buttonText: "Disagree",
-                        margin: EdgeInsets.all(16),
-                        onPressed: () {
-                          widget.onAgree(false);
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: GradientButton(
-                        buttonText: "Agree",
-                        margin: EdgeInsets.all(16),
-                        onPressed: () {
-                          widget.onAgree(true);
-                        }
-                      ),
+            body: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 82),
+                  child: WebView(
+                    initialUrl: 'about:blank',
+                    onWebViewCreated: (WebViewController webViewController) {
+                      _controller = webViewController;
+                      _loadHtmlFromAssets();
+                    },
+                  ),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GradientButton(
+                            buttonText: "Disagree",
+                            margin: EdgeInsets.all(16),
+                            onPressed: () {
+                              widget.onAgree(false);
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: GradientButton(
+                            buttonText: "Agree",
+                            margin: EdgeInsets.all(16),
+                            onPressed: () {
+                              widget.onAgree(true);
+                            }
+                          ),
+                        ),
+                      ],
                     ),
                   ],
-                ),
+                )
               ],
-            )
-          ],
+            ),
+          ),
         ),
       ),
     );

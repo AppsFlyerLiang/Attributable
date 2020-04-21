@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "378580604543",
+    "firebase_url": "https://attributable.firebaseio.com",
+    "project_id": "attributable",
+    "storage_bucket": "attributable.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:378580604543:android:e9a069c5281d431cd7114a",
+        "android_client_info": {
+          "package_name": "com.fascode.attributable"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "378580604543-1f27opg64fn8qtat32v96p8bps4kmejk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCxN_NKrSFikZjGi75glNkyIHuYZJ4ccg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "378580604543-1f27opg64fn8qtat32v96p8bps4kmejk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

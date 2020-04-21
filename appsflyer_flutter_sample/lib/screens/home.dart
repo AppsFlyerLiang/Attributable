@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttersample/screens/track_event.dart';
 import 'package:fluttersample/widgets/image_background_container.dart';
-
-import '../app_config.dart';
 import 'conversion.dart';
 import 'other_feature.dart';
 

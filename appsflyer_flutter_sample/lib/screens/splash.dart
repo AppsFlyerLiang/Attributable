@@ -1,19 +1,37 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttersample/models/app_data.dart';
-import 'package:fluttersample/widgets/image_background_container.dart';
+import '../app_config.dart';
+import '../models/app_data.dart';
+import '../widgets/image_background_container.dart';
 import 'package:provider/provider.dart';
 
+
 class Splash extends StatefulWidget {
+  final Function onFinish;
   @override
   _SplashState createState() => _SplashState();
+
+  Splash({this.onFinish});
 }
 
 class _SplashState extends State<Splash> {
+  bool _redirected = false;
+
   @override
   Widget build(BuildContext context) {
-    AppData appData = Provider.of<AppData>(context);
-    print("[Splash] build");
+    var appData = Provider.of<AppData>(context);
+    print("[Splash] build \n$appData");
+    print("[Splash] appData.hashCode: ${appData.hashCode}");
+    print("[Splash] Global appData.hashCode: ${AppConfig.appData.hashCode}");
+    print("[Splash] appOpenAttributionData.type. ${appData.appOpenAttributionData?.type}");
+    print("[Splash] conversionResponse.type:  ${appData.conversionResponse?.type}");
+    print("[Splash] Global appOpenAttributionData.type ${AppConfig.appData.appOpenAttributionData?.type}");
+    print("[Splash] Global conversionResponse.type: ${AppConfig.appData.conversionResponse?.type}");
+    print("[Splash] AppConfig.appOpenAttributionData.hashCode ${AppConfig.appOpenAttributionData.hashCode}");
+    print("[Splash] AppConfig.appOpenAttributionData.type. ${AppConfig.appOpenAttributionData?.type}");
+    _checkUpdate(context, appData);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -70,21 +88,73 @@ class _SplashState extends State<Splash> {
                                   ? Colors.green
                                   : Colors.red))),
                       TextSpan(text: "\nGet Conversion Data: "),
-                      TextSpan(text: appData.getConversionDataDone
+                      TextSpan(text: appData.conversionResponse!=null
                           ? "done"
                           : "processing...",
                           style: TextStyle(fontWeight: FontWeight.bold,
-                              color: (appData.getConversionDataDone
+                              color: (appData.conversionResponse!=null
                                   ? Colors.green
                                   : Colors.red))),
                     ],
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
     );
+  }
+  bool _handleDeferredDeepLinking(ConversionResponse cv) {
+    if (cv!=null && "OK" == cv.status && "onConversionLoadSuccess" == cv.type) {
+      Map<String, dynamic> cvData = cv.data;
+      if (cvData["is_first_launch"] ?? false) {
+        if (cvData["af_adset"] == "defer") {
+          return true;
+        } else if (cvData["af_dp"]?.toString()?.startsWith("attributable://") ?? false) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  void _gotoDeepLink(BuildContext context, bool isDeferred, Map<String, dynamic> data) {
+    print("[Splash] Go to DeepLink");
+    if(!_redirected) {
+      _redirected = true;
+      widget.onFinish?.call();
+      Future.delayed(Duration(seconds: 0)).then((value) {
+        Navigator.popAndPushNamed(
+            context, "/DeepLink");
+      });
+    }
+  }
+
+  void _gotoHome(BuildContext context){
+    print("[Splash] Go to Home");
+    if(!_redirected) {
+      _redirected = true;
+      widget.onFinish?.call();
+      Future.delayed(Duration(seconds: 0)).then((value) {
+        Navigator.popAndPushNamed(context, "/Home");
+      });
+    }
+  }
+
+
+  void _checkUpdate(BuildContext context, AppData appData) {
+    if(appData.appOpenAttributionData!=null) {
+      print("Deep Link");
+      _gotoDeepLink(context, false, appData.appOpenAttributionData.data);
+    } else if(appData.conversionResponse!=null) {
+      if (_handleDeferredDeepLinking(appData.conversionResponse)) {
+        print("Conversion Data Loaded and found Deferred Deep Link");
+        _gotoDeepLink(context, true, appData.conversionResponse.data);
+      } else {
+        print("Conversion Data Loaded");
+        _gotoHome(context);
+      }
+    }
   }
 }
