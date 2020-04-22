@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttersample/screens/deep_link.dart';
 import 'package:fluttersample/screens/track_event.dart';
+import 'package:fluttersample/utils/page_route_builders.dart';
 import 'package:fluttersample/widgets/image_background_container.dart';
+import 'package:provider/provider.dart';
+import '../app_config.dart';
 import 'conversion.dart';
 import 'other_feature.dart';
 
@@ -21,6 +25,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    var appData = Provider.of<AppData>(context);
+    _checkUpdate(context, appData);
     final List<Widget> _tabContents = [
       Conversion(),
       TrackEvent(),
@@ -64,4 +70,15 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       ),
     );
   }
+
+  void _checkUpdate(BuildContext context, AppData appData) {
+    print("[_checkUpdate] ${appData.hashCode} ${AppConfig.appData.hashCode} ${appData.hasNewDeepLinking} ${AppConfig.appData.hasNewDeepLinking}");
+    if(appData.hasNewDeepLinking) {
+      print("[Home] Deep Link");
+      Future.delayed(Duration(seconds: 0)).then((value) {
+        Navigator.push(context, PlainRouteBuilder(DeepLink()));
+      });
+    }
+  }
+
 }

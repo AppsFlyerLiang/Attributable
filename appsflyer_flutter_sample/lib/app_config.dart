@@ -12,9 +12,7 @@ import './models/app_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum InitResult {
-  askPrivacyPolicy,
   home,
-  splash,
   deepLink,
   deferredDeepLink,
 }
@@ -58,7 +56,7 @@ class AppConfig {
     });
   }
 
-  static Future<InitResult> initBeforeAgreement() async {
+  static Future<bool> checkAgreement() async {
     print("[initBeforeAgreement  >>>>>>>>>>>> ]");
 
     if (appData.privacyPolicyAgreed) {
@@ -67,18 +65,17 @@ class AppConfig {
     } else {
       appData.privacyPolicyAgreed = await isPrivacyPolicyAgreed;
       print("[initBeforeAgreement  ${appData.privacyPolicyAgreed} <<<<<<<<<<<< ]");
-      return appData.privacyPolicyAgreed ? null : InitResult.askPrivacyPolicy;
+      return appData.privacyPolicyAgreed;
     }
   }
-//  static FirebaseMessaging firebaseMessage = FirebaseMessaging();
 
-  static Future<InitResult> initAfterAgreement() async {
+  static Future<bool> initAfterAgreement() async {
     print("[initAfterAgreement  >>>>>>>>>>>> ]");
-    InitResult result = await initAppsFlyerSdk();
     retrieveDeviceId();
     _initFirebase();
-    print("[initBeforeAgreement  <<<<<<<<<<<< ]");
-    return result ?? InitResult.splash;
+    bool result = await initAppsFlyerSdk();
+    print("[initAfterAgreement $result <<<<<<<<<<<< ]");
+    return result;
   }
   static String advertisingId;
 
@@ -125,18 +122,13 @@ class AppConfig {
     print("[_initPlatformConfig  <<<<<<<<<<<< ]");
   }
   static ConversionResponse appOpenAttributionData;
-  static Future<InitResult> initAppsFlyerSdk() async {
+  static Future<bool> initAppsFlyerSdk() async {
     print("[_initAppsFlyerSdk  >>>>>>>>>>>> ]");
-    InitResult result;
-    if (appsflyerSdk != null) {
-      print("[_initAppsFlyerSdk] was already initialized!");
-      print("[_initAppsFlyerSdk  <<<<<<<<<<<< ]");
-      return null;
-    }
+    bool result = false;
     appsflyerSdk = AppsflyerSdk({
       "afDevKey": "SC6zv6Zb6N52vePBePs5Xo",
       "afAppId": "3333999931",
-      "isDebug": false,
+      "isDebug": true,
     });
     try {
       Map<dynamic, dynamic> response = await appsflyerSdk.initSdk(
@@ -145,20 +137,22 @@ class AppConfig {
       appData.initAppsFlyerSdkDone = true;
       appsflyerSdk.appOpenAttributionStream.asBroadcastStream().listen((data) {
         print("[appsflyerSdk.appOpenAttributionStream] listen callback: $data");
+        appData.hasNewDeepLinking = true;
+        print("[appsflyerSdk.appOpenAttributionStream] ${appData.hashCode} ${AppConfig.appData.hashCode} ${appData.hasNewDeepLinking} ${AppConfig.appData.hasNewDeepLinking}");
         appData.appOpenAttributionData = ConversionResponse.fromJson(data);
-        appOpenAttributionData = ConversionResponse.fromJson(data);
-        print("[appsflyerSdk.appOpenAttributionStream][appData.hashCode] ${appData.hashCode}");
-        print("[appsflyerSdk.appOpenAttributionStream] appOpenAttributionData.type. ${appData.appOpenAttributionData?.type}");
-        print("[appsflyerSdk.appOpenAttributionStream][AppConfig.appOpenAttributionData.hashCode] ${AppConfig.appOpenAttributionData.hashCode}");
-        print("[appsflyerSdk.appOpenAttributionStream] AppConfig.appOpenAttributionData.type. ${AppConfig.appOpenAttributionData?.type}");
       });
 
       appsflyerSdk.conversionDataStream.asBroadcastStream().listen((data) {
         print("[appsflyerSdk.conversionDataStream] listen callback: $data");
-        appData.conversionResponse = ConversionResponse.fromJson(data);
+        var cv = ConversionResponse.fromJson(data);
+        if(_checkDeferredDeepLinking(AppConfig.appData.conversionResponse)) {
+          appData.hasNewDeferredDeepLinking = true;
+        }
+        appData.conversionResponse = cv;
       });
       if ("OK" == response["status"]) {
         print("[appsflyerSdk.initSdk] $response");
+        result = true;
       } else {
         print("[appsflyerSdk.initSdk] failed");
         response?.forEach((key, value) {
@@ -168,8 +162,22 @@ class AppConfig {
     } catch (exception) {
       print("exception : $exception");
     }
-    print("[_initAppsFlyerSdk  <<<<<<<<<<<< ]");
+    print("[_initAppsFlyerSdk $result <<<<<<<<<<<< ]");
     return result;
+  }
+
+  static bool _checkDeferredDeepLinking(ConversionResponse cv) {
+    if (cv!=null && "OK" == cv.status && "onConversionLoadSuccess" == cv.type) {
+      Map<String, dynamic> cvData = cv.data;
+      if (cvData["is_first_launch"] ?? false) {
+        if (cvData["af_adset"] == "defer") {
+          return true;
+        } else if (cvData["af_dp"]?.toString()?.startsWith("attributable://") ?? false) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   static void _handleDeepLink(Map<dynamic, dynamic> cvData) {
@@ -218,15 +226,16 @@ class AppData with ChangeNotifier {
   bool _retrieveDeviceIdDone = false;
   bool _initAppsFlyerSdkDone = false;
   bool _privacyPolicyAgreed = false;
+  bool hasNewDeepLinking = false;
+  bool hasNewDeferredDeepLinking = false;
   ConversionResponse _conversionResponse;
-  ConversionResponse _appOpenAttributionData;
-
   ConversionResponse get conversionResponse => _conversionResponse;
   set conversionResponse(ConversionResponse value) {
     _conversionResponse = value;
     notifyListeners();
   }
 
+  ConversionResponse _appOpenAttributionData;
   ConversionResponse get appOpenAttributionData => _appOpenAttributionData;
   set appOpenAttributionData(ConversionResponse value) {
     _appOpenAttributionData = value;

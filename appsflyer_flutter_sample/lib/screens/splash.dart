@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttersample/screens/deep_link.dart';
+import 'package:fluttersample/screens/home.dart';
+import 'package:fluttersample/utils/page_route_builders.dart';
 import '../app_config.dart';
 import '../models/app_data.dart';
 import '../widgets/image_background_container.dart';
@@ -9,7 +12,7 @@ import 'package:provider/provider.dart';
 
 
 class Splash extends StatefulWidget {
-  final Function onFinish;
+  final Function(InitResult) onFinish;
   @override
   _SplashState createState() => _SplashState();
 
@@ -123,11 +126,11 @@ class _SplashState extends State<Splash> {
     print("[Splash] Go to DeepLink");
     if(!_redirected) {
       _redirected = true;
-      widget.onFinish?.call();
-      Future.delayed(Duration(seconds: 0)).then((value) {
-        Navigator.popAndPushNamed(
-            context, "/DeepLink");
-      });
+      widget.onFinish?.call(isDeferred ? InitResult.deferredDeepLink : InitResult.deepLink);
+//      Future.delayed(Duration(seconds: 0)).then((value) {
+//        Navigator.pushAndRemoveUntil(
+//            context, ScalePageRouteBuilder(DeepLink(isDeferred: true)), (route) => route==null);
+//      });
     }
   }
 
@@ -135,19 +138,17 @@ class _SplashState extends State<Splash> {
     print("[Splash] Go to Home");
     if(!_redirected) {
       _redirected = true;
-      widget.onFinish?.call();
-      Future.delayed(Duration(seconds: 0)).then((value) {
-        Navigator.popAndPushNamed(context, "/Home");
-      });
+      widget.onFinish?.call(InitResult.home);
+//      Future.delayed(Duration(seconds: 0)).then((value) {
+//        Navigator.pushAndRemoveUntil(
+//            context, ScalePageRouteBuilder(Home()), (route) => route==null);
+//      });
     }
   }
 
 
   void _checkUpdate(BuildContext context, AppData appData) {
-    if(appData.appOpenAttributionData!=null) {
-      print("Deep Link");
-      _gotoDeepLink(context, false, appData.appOpenAttributionData.data);
-    } else if(appData.conversionResponse!=null) {
+    if(appData.conversionResponse!=null) {
       if (_handleDeferredDeepLinking(appData.conversionResponse)) {
         print("Conversion Data Loaded and found Deferred Deep Link");
         _gotoDeepLink(context, true, appData.conversionResponse.data);

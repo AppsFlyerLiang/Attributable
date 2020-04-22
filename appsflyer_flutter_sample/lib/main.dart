@@ -4,22 +4,7 @@ import 'app_config.dart';
 
 import 'screens/my_app.dart';
 
-main() async{
-  print("[main]");
-  print("[main]AppConfig.appData.hashCode:  ${AppConfig.appData?.hashCode}");
+main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  InitResult result = await AppConfig.initBeforeAgreement();
-  if (InitResult.askPrivacyPolicy == result) {
-    result = InitResult.askPrivacyPolicy;
-    runApp(MyApp(result));
-  } else {
-    print("Normal Start appOpenAttributionData.type. ${AppConfig.appData?.appOpenAttributionData?.type}");
-    result = await AppConfig.initAfterAgreement().timeout(
-        Duration(milliseconds: 1000), onTimeout: () => InitResult.splash
-    ).catchError((err) =>
-    {
-      print("initAfterAgreement Error: $err")
-    });
-    runApp(MyApp(result));
-  }
+  runApp(MyApp(await AppConfig.checkAgreement()));
 }
