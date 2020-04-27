@@ -21,11 +21,25 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+def releaseStorePassword = localProperties.getProperty('release.storePassword')
+
+def releaseAlias = localProperties.getProperty('release.alias')
+
+def releaseAliasPassword = localProperties.getProperty('release.aliasPassword')
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('/Users/liang/Source/Flutter/AppsFlyerFlutterSample/appsflyer_flutter_sample/release/release.keystore')
+            storePassword releaseStorePassword
+            keyAlias = releaseAlias
+            keyPassword releaseAliasPassword
+        }
+    }
     compileSdkVersion 28
 
     sourceSets {
@@ -37,20 +51,17 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.appsflyer.flutter.sample"
-        minSdkVersion 16
+        applicationId "com.fascode.attributable"
+        minSdkVersion 22
         targetSdkVersion 28
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
         }
     }
 }
@@ -61,7 +72,7 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    implementation "com.google.firebase:firebase-messaging:20.1.5"
+    implementation 'com.android.installreferrer:installreferrer:1.1.2'
 }
+apply plugin: 'com.google.gms.google-services'
