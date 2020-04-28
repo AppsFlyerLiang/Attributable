@@ -17,6 +17,7 @@ class PrivacyPolicy extends StatefulWidget {
 
 class _PrivacyPolicyState extends State<PrivacyPolicy> {
   WebViewController _controller;
+
   bool _canGoBack = false;
   Future<bool> _onBack() async {
     String currentUrl =  await _controller.currentUrl();
@@ -52,7 +53,6 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 82),
                 child: WebView(
-                  initialUrl: 'about:blank',
                   onWebViewCreated: (WebViewController webViewController) {
                     _controller = webViewController;
                     _loadHtmlFromAssets();
@@ -101,10 +101,10 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
   }
   _loadHtmlFromAssets() async {
     String fileText = await rootBundle.loadString('assets/html/privacy_policy.html');
-    _controller.loadUrl( Uri.dataFromString(
+    await _controller.loadUrl( Uri.dataFromString(
         fileText,
         mimeType: 'text/html',
-        encoding: Encoding.getByName('utf-8')
+        encoding: Encoding.getByName('UTF-8')
     ).toString());
   }
 }

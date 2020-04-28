@@ -1,6 +1,7 @@
 
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:advertising_id/advertising_id.dart';
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
@@ -38,14 +39,13 @@ class AppConfig {
   }
 
   static const platform = const MethodChannel('com.fascode.attributable/installReferrer');
-  static Future<Map<String, dynamic>> readInstallReferrer() async {
+  static Future readInstallReferrer() async {
     try {
       Map installReferrer =  await platform.invokeMethod('getInstallReferrer');
       print("installReferrer: $installReferrer");
       appData.installReferrer = installReferrer;
-    } on PlatformException catch(exception) {
-      print(exception.message);
-      return null;
+    } on Exception catch(exception) {
+      print(exception.toString());
     }
   }
 
@@ -66,7 +66,9 @@ class AppConfig {
     print("[initAfterAgreement  >>>>>>>>>>>> ]");
     retrieveDeviceId();
     _initFirebase();
-    await readInstallReferrer();
+    if(Platform.isAndroid) {
+      await readInstallReferrer();
+    }
     bool result = await initAppsFlyerSdk();
     print("[initAfterAgreement $result <<<<<<<<<<<< ]");
     return result;
@@ -121,7 +123,7 @@ class AppConfig {
     bool result = false;
     appsflyerSdk = AppsflyerSdk({
       "afDevKey": "SC6zv6Zb6N52vePBePs5Xo",
-      "afAppId": "3333999931",
+      "afAppId": "1510597638",
       "isDebug": true,
     });
     try {

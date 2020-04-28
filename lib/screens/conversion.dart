@@ -70,7 +70,7 @@ class _ConversionState extends State<Conversion> {
               textAlign: TextAlign.start,
               text: TextSpan(style: textStyleKey,
                   children: [
-                    TextSpan(text: Platform.isIOS ? "IDFA" : "Advertising id: "),
+                    TextSpan(text: Platform.isIOS ? "IDFA: " : "Advertising id: "),
                     TextSpan(text: AppConfig.advertisingId, style: textStyleValue),
                     TextSpan(text: "\n"),
                     TextSpan(text: "AppsFlyer Id: "),
@@ -93,28 +93,32 @@ class _ConversionState extends State<Conversion> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 16.0),
-          child: Text("Install Referrer", textAlign: TextAlign.center,
-            style: TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 22, color: Theme
-                .of(context)
-                .primaryColor),),
-        ),
-        Card(
-          child: Padding(
-            padding: EdgeInsets.all(12),
-            child: RichText(
-              text: TextSpan(
-                style: TextStyle(fontSize: 16),
-                children: referrer!=null
+        if(Platform.isAndroid) ... {
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: Text("Install Referrer", textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: 22, color: Theme
+                  .of(context)
+                  .primaryColor),),
+          ),
+          Card(
+            child: Padding(
+              padding: EdgeInsets.all(12),
+              child: RichText(
+                text: TextSpan(
+                  style: TextStyle(fontSize: 16),
+                  children: referrer != null
                       ? _buildParameters(referrer, textStyleKey, textStyleValue)
-                      : [TextSpan(text: "No data found!", style: TextStyle(color: Colors.yellowAccent))],
+                      : [
+                    TextSpan(text: "No data found!",
+                        style: TextStyle(color: Colors.yellowAccent))
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-
+        },
         Padding(
           padding: const EdgeInsets.only(top: 16.0),
           child: Text("Conversion Data", textAlign: TextAlign.center,
