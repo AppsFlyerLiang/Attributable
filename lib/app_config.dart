@@ -24,7 +24,7 @@ class AppConfig {
   static AppsflyerSdk appsflyerSdk;
   static FirebaseAnalytics analytics;
   static AppData appData = AppData();
-  static FirebaseMessaging firebaseMessage = FirebaseMessaging();
+  static FirebaseMessaging firebaseMessage;
   static RemoteConfig remoteConfig;
   static String flavor = "GooglePlay";
   static get isPrivacyPolicyAgreed async {
@@ -38,8 +38,8 @@ class AppConfig {
         prefs.setBool("isPrivacyPolicyAggreed", agreed));
   }
 
-  static const platform = const MethodChannel('com.fascode.attributable/installReferrer');
   static Future readInstallReferrer() async {
+    const platform = const MethodChannel('com.fascode.attributable/installReferrer');
     try {
       Map installReferrer =  await platform.invokeMethod('getInstallReferrer');
       print("installReferrer: $installReferrer");
@@ -48,7 +48,15 @@ class AppConfig {
       print(exception.toString());
     }
   }
-
+  static Future measureUninstall() async {
+    const platform = const MethodChannel('com.fascode.attributable/push');
+    try {
+      bool success = await platform.invokeMethod('measureUninstall');
+      print("measureUninstall: $success");
+    } on Exception catch(exception) {
+      print(exception.toString());
+    }
+  }
   static Future<bool> checkAgreement() async {
     print("[initBeforeAgreement  >>>>>>>>>>>> ]");
 
@@ -70,6 +78,9 @@ class AppConfig {
       await readInstallReferrer();
     }
     bool result = await initAppsFlyerSdk();
+    if(Platform.isIOS) {
+      measureUninstall();
+    }
     print("[initAfterAgreement $result <<<<<<<<<<<< ]");
     return result;
   }
@@ -97,6 +108,7 @@ class AppConfig {
     try {
       analytics = FirebaseAnalytics();
       analytics.logAppOpen();
+      firebaseMessage = FirebaseMessaging();
       firebaseMessage.configure(
         onMessage: onFirebaseMessage,
         onBackgroundMessage: onFirebaseBackgroundMessage,
@@ -107,10 +119,6 @@ class AppConfig {
         print("onTokenRefresh:$deviceToken");
         appsflyerSdk?.updateServerUninstallToken(deviceToken);
       });
-
-      analytics = FirebaseAnalytics();
-      analytics.logAppOpen();
-
       remoteConfig = await RemoteConfig.instance;
     } catch (exception) {
       print("exception : $exception");
@@ -174,11 +182,6 @@ class AppConfig {
     }
     return false;
   }
-
-  static void _handleDeepLink(Map<dynamic, dynamic> cvData) {
-    print("[_handleDeepLink] Conversion Data $cvData");
-  }
-
   static Future<dynamic> onFirebaseMessage(Map<String, dynamic> message) async {
     print("onFirebaseMessage");
     message.forEach((key, value) {

@@ -66,9 +66,8 @@ class _ConversionState extends State<Conversion> {
         Card(
           child: Padding(
             padding: EdgeInsets.all(12),
-            child: RichText(
-              textAlign: TextAlign.start,
-              text: TextSpan(style: textStyleKey,
+            child: SelectableText.rich(
+              TextSpan(style: textStyleKey,
                   children: [
                     TextSpan(text: Platform.isIOS ? "IDFA: " : "Advertising id: "),
                     TextSpan(text: AppConfig.advertisingId, style: textStyleValue),
@@ -90,6 +89,7 @@ class _ConversionState extends State<Conversion> {
                         : TextSpan(text: "loading...",
                         style: TextStyle(color: Colors.yellowAccent, fontSize: 14)),
                   ]),
+              textAlign: TextAlign.start,
             ),
           ),
         ),
@@ -105,8 +105,8 @@ class _ConversionState extends State<Conversion> {
           Card(
             child: Padding(
               padding: EdgeInsets.all(12),
-              child: RichText(
-                text: TextSpan(
+              child: SelectableText.rich(
+                TextSpan(
                   style: TextStyle(fontSize: 16),
                   children: referrer != null
                       ? _buildParameters(referrer, textStyleKey, textStyleValue)
@@ -130,8 +130,8 @@ class _ConversionState extends State<Conversion> {
         Card(
           child: Padding(
             padding: EdgeInsets.all(12),
-            child: RichText(
-              text: TextSpan(
+            child: SelectableText.rich(
+              TextSpan(
                 style: textStyleKey,
                 children: <TextSpan>[
                   TextSpan(text: "Conversion status: "),
@@ -163,8 +163,8 @@ class _ConversionState extends State<Conversion> {
         Card(
           child: Padding(
             padding: EdgeInsets.all(12),
-            child: RichText(
-              text: TextSpan(
+            child: SelectableText.rich(
+              TextSpan(
                 style: textStyleKey,
                 children: <TextSpan>[
                   TextSpan(text: "Conversion status: "),

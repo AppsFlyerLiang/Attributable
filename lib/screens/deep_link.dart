@@ -64,8 +64,8 @@ class _DeepLinkState extends State<DeepLink> {
               Card(
                 child: Padding(
                   padding: EdgeInsets.all(12),
-                  child: RichText(
-                    text: TextSpan(
+                  child: SelectableText.rich(
+                    TextSpan(
                       style: textStyleKey,
                       children: <TextSpan>[
                         TextSpan(text: "Conversion status: "),
