@@ -182,7 +182,7 @@ class _TrackEventState extends State<TrackEvent> {
   }
 
   void _sendEvent(BuildContext context, AFEventItem e) {
-    AppConfig.appsflyerSdk.trackEvent(e.eventName, e.eventValues).then((value) {
+    AppConfig.appsflyerSdk.logEvent(e.eventName, e.eventValues).then((value) {
       showGeneralDialog(
           context: context,
           barrierLabel: "Event sent!",

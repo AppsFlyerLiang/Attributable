@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:advertising_info/advertising_info.dart';
 import 'package:flutter/material.dart';
 import '../app_config.dart';
 import 'package:package_info/package_info.dart';
@@ -14,6 +15,7 @@ class _ConversionState extends State<Conversion> {
   String _appsflyerId;
   String _appVersion;
   String _sdkVersion;
+  AdvertisingInfo _advertisingInfo = AppConfig.advertisingInfo;
   @override
   void initState() {
     super.initState();
@@ -44,6 +46,16 @@ class _ConversionState extends State<Conversion> {
         _sdkVersion = "Load failed";
       });
     });
+
+    AdvertisingInfo.read().then((value) {
+      setState(() {
+        _advertisingInfo = value;
+      });
+    });
+  }
+  loadingText() {
+    return TextSpan(text: "loading...",
+        style: TextStyle(color: Colors.yellowAccent, fontSize: 14));
   }
   @override
   Widget build(BuildContext context) {
@@ -70,18 +82,13 @@ class _ConversionState extends State<Conversion> {
               TextSpan(style: textStyleKey,
                   children: [
                     TextSpan(text: Platform.isIOS ? "IDFA: " : "Advertising id: "),
-                    TextSpan(text: AppConfig.advertisingId, style: textStyleValue),
+                    _advertisingInfo?.id!=null ? TextSpan(text: _advertisingInfo?.id, style: textStyleValue) : loadingText(),
                     TextSpan(text: "\n"),
-                    TextSpan(text: "AppsFlyer Id: "),
-                    _appsflyerId!=null ? TextSpan(text: _appsflyerId, style: textStyleValue)
-                    : TextSpan(text: "loading...",
-                        style: TextStyle(color: Colors.yellowAccent, fontSize: 14)),
+                    TextSpan(text: "Limited Ad Tracking: "),
+                    TextSpan(text: _advertisingInfo?.isLimitAdTrackingEnabled.toString(), style: textStyleValue),
                     TextSpan(text: "\n"),
-                    TextSpan(text: "SDK Version: "),
-                    _sdkVersion!=null ? TextSpan(text: _sdkVersion,
-                        style: textStyleValue)
-                        : TextSpan(text: "loading...",
-                        style: TextStyle(color: Colors.yellowAccent, fontSize: 14)),
+                    TextSpan(text: "Authorization Status(iOS14+): "),
+                    TextSpan(text: _advertisingInfo?.authorizationStatus?.toString()?.split('.')[1] ?? "loading...", style: textStyleValue),
                     TextSpan(text: "\n"),
                     TextSpan(text: "App Version: "),
                     _appVersion!=null ? TextSpan(text: _appVersion,
@@ -134,6 +141,16 @@ class _ConversionState extends State<Conversion> {
               TextSpan(
                 style: textStyleKey,
                 children: <TextSpan>[
+                  TextSpan(text: "AppsFlyer Id: "),
+                  _appsflyerId!=null ? TextSpan(text: _appsflyerId, style: textStyleValue)
+                      : TextSpan(text: "loading...",
+                      style: TextStyle(color: Colors.yellowAccent, fontSize: 14)),
+                  TextSpan(text: "\n"),
+                  TextSpan(text: "SDK Version: "),
+                  _sdkVersion!=null ? TextSpan(text: _sdkVersion,
+                      style: textStyleValue)
+                      : TextSpan(text: "loading...",
+                      style: TextStyle(color: Colors.yellowAccent, fontSize: 14)),
                   TextSpan(text: "Conversion status: "),
                   TextSpan(text: cvResponse?.status,
                       style: textStyleValue),

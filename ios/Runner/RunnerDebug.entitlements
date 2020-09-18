@@ -6,7 +6,7 @@
 	<string>development</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:attributable.onelink.me</string>
+		<string>applinks:attr.onelink.me</string>
 	</array>
 </dict>
 </plist>

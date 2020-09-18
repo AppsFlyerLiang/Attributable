@@ -49,7 +49,7 @@ class Splash extends StatelessWidget {
                               color: (appData.privacyPolicyAgreed
                                   ? Colors.green
                                   : Colors.red))),
-                      TextSpan(text: "\nRetrieve device id: "),
+                      TextSpan(text: "\nRetrieve advertising info: "),
                       TextSpan(text: appData.retrieveDeviceIdDone
                           ? "done"
                           : "processing...",

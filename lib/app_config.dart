@@ -3,7 +3,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:advertising_id/advertising_id.dart';
+import 'package:advertising_info/advertising_info.dart';
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -72,7 +72,7 @@ class AppConfig {
 
   static Future<bool> initAfterAgreement() async {
     print("[initAfterAgreement  >>>>>>>>>>>> ]");
-    retrieveDeviceId();
+    retrieveAdvertiserInfo();
     _initFirebase();
     if(Platform.isAndroid) {
       await readInstallReferrer();
@@ -84,23 +84,22 @@ class AppConfig {
     print("[initAfterAgreement $result <<<<<<<<<<<< ]");
     return result;
   }
-  static String advertisingId;
+  static AdvertisingInfo advertisingInfo;
 
-  static Future<String> retrieveDeviceId() async {
+  static Future<AdvertisingInfo> retrieveAdvertiserInfo() async {
     print("[retrieveDeviceId  >>>>>>>>>>>> ]");
-    if (advertisingId != null)
-      return advertisingId;
+    if (advertisingInfo != null)
+      return advertisingInfo;
     else {
       try {
-        advertisingId = await AdvertisingId.id;
+        advertisingInfo = await AdvertisingInfo.read();
         appData.retrieveDeviceIdDone = true;
-        print("[DeviceIdHelper] retrieved advertiserId: $advertisingId");
       } on Exception catch (error) {
-        print("[DeviceIdHelper] failed to get advertiserId: $error");
+        print("[DeviceIdHelper] failed to get advertisingInfo: $error");
       }
     }
     print("[retrieveDeviceId  <<<<<<<<<<<< ]");
-    return advertisingId;
+    return advertisingInfo;
   }
 
   static Future _initFirebase() async {
@@ -116,14 +115,13 @@ class AppConfig {
         onResume: onFirebaseResume,
       );
       firebaseMessage.onTokenRefresh.listen((deviceToken) {
-        print("onTokenRefresh:$deviceToken");
         appsflyerSdk?.updateServerUninstallToken(deviceToken);
       });
       remoteConfig = await RemoteConfig.instance;
     } catch (exception) {
       print("exception : $exception");
     }
-    print("[_initPlatformConfig  <<<<<<<<<<<< ]");
+    print("[_initFirebase  <<<<<<<<<<<< ]");
   }
   static ConversionResponse appOpenAttributionData;
   static Future<bool> initAppsFlyerSdk() async {
