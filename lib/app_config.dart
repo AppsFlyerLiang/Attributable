@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:advertising_info/advertising_info.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -21,7 +22,11 @@ enum InitResult {
 
 
 class AppConfig {
-  static AppsflyerSdk appsflyerSdk;
+  static AppsflyerSdk appsflyerSdk = AppsflyerSdk({
+    "afDevKey": "SC6zv6Zb6N52vePBePs5Xo",
+    "afAppId": "1532204450",
+    "isDebug": false,
+  });
   static FirebaseAnalytics analytics;
   static AppData appData = AppData();
   static FirebaseMessaging firebaseMessage;
@@ -115,7 +120,9 @@ class AppConfig {
         onResume: onFirebaseResume,
       );
       firebaseMessage.onTokenRefresh.listen((deviceToken) {
-        appsflyerSdk?.updateServerUninstallToken(deviceToken);
+        if(Platform.isAndroid) {
+          appsflyerSdk?.updateServerUninstallToken(deviceToken);
+        }
       });
       remoteConfig = await RemoteConfig.instance;
     } catch (exception) {
@@ -123,42 +130,25 @@ class AppConfig {
     }
     print("[_initFirebase  <<<<<<<<<<<< ]");
   }
+  static Future<bool> waitForATTUserAuthorization(double sec) async {
+    const platform = const MethodChannel('com.fascode.attributable/att');
+    try {
+      return await platform.invokeMethod('waitForATTUserAuthorization', sec);
+    } on Exception catch(exception) {
+      print(exception.toString());
+    }
+    return false;
+  }
   static ConversionResponse appOpenAttributionData;
   static Future<bool> initAppsFlyerSdk() async {
     print("[_initAppsFlyerSdk  >>>>>>>>>>>> ]");
     bool result = false;
-    appsflyerSdk = AppsflyerSdk({
-      "afDevKey": "SC6zv6Zb6N52vePBePs5Xo",
-      "afAppId": "1510597638",
-      "isDebug": true,
-    });
     try {
-      Map<dynamic, dynamic> response = await appsflyerSdk.initSdk(
-          registerConversionDataCallback: true,
-          registerOnAppOpenAttributionCallback: true);
-      appData.initAppsFlyerSdkDone = true;
-      appsflyerSdk.appOpenAttributionStream.asBroadcastStream().listen((data) {
-        print("[appsflyerSdk.appOpenAttributionStream] listen callback: $data");
-        appData.hasNewDeepLinking = true;
-        appData.appOpenAttributionData = ConversionResponse.fromJson(data);
-      });
-
-      appsflyerSdk.conversionDataStream.asBroadcastStream().listen((data) {
-        print("[appsflyerSdk.conversionDataStream] listen callback: $data");
-        var cv = ConversionResponse.fromJson(data);
-        if(_checkDeferredDeepLinking(AppConfig.appData.conversionResponse)) {
-          appData.hasNewDeferredDeepLinking = true;
-        }
-        appData.conversionResponse = cv;
-      });
-      if ("OK" == response["status"]) {
-        print("[appsflyerSdk.initSdk] $response");
-        result = true;
-      } else {
-        print("[appsflyerSdk.initSdk] failed");
-        response?.forEach((key, value) {
-          print("[appsflyerSdk.initSdk] response[$key]=$value");
-        });
+      bool isWaiting = await waitForATTUserAuthorization(60.0);
+      result = await startAttribution();
+      if(isWaiting) {
+        TrackingStatus status = await AppTrackingTransparency.requestTrackingAuthorization();
+        print("[requestTrackingAuthorization  status: $status ]");
       }
     } catch (exception) {
       print("exception : $exception");
@@ -166,7 +156,36 @@ class AppConfig {
     print("[_initAppsFlyerSdk $result <<<<<<<<<<<< ]");
     return result;
   }
+  static Future<bool> startAttribution() async {
+    Map<dynamic, dynamic> response = await appsflyerSdk.initSdk(
+        registerConversionDataCallback: true,
+        registerOnAppOpenAttributionCallback: true);
+    appData.initAppsFlyerSdkDone = true;
+    appsflyerSdk.appOpenAttributionStream.asBroadcastStream().listen((data) {
+      print("[appsflyerSdk.appOpenAttributionStream] listen callback: $data");
+      appData.hasNewDeepLinking = true;
+      appData.appOpenAttributionData = ConversionResponse.fromJson(data);
+    });
 
+    appsflyerSdk.conversionDataStream.asBroadcastStream().listen((data) {
+      print("[appsflyerSdk.conversionDataStream] listen callback: $data");
+      var cv = ConversionResponse.fromJson(data);
+      if(_checkDeferredDeepLinking(AppConfig.appData.conversionResponse)) {
+        appData.hasNewDeferredDeepLinking = true;
+      }
+      appData.conversionResponse = cv;
+    });
+    if ("OK" == response["status"]) {
+      print("[appsflyerSdk.initSdk] $response");
+      return true;
+    } else {
+      print("[appsflyerSdk.initSdk] failed");
+      response?.forEach((key, value) {
+        print("[appsflyerSdk.initSdk] response[$key]=$value");
+      });
+      return false;
+    }
+  }
   static bool _checkDeferredDeepLinking(ConversionResponse cv) {
     if (cv!=null && "OK" == cv.status && "onConversionLoadSuccess" == cv.type) {
       Map<String, dynamic> cvData = cv.data;

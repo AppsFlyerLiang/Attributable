@@ -45,6 +45,7 @@ class _MyAppState extends State<MyApp> {
       ],
       child: MaterialApp(
         title: 'Attributable',
+        debugShowCheckedModeBanner: false,
         themeMode: ThemeMode.system,
         darkTheme: ThemeData(
           primarySwatch: Colors.blueGrey,

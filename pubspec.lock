@@ -8,6 +8,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.1"
+  app_tracking_transparency:
+    dependency: "direct main"
+    description:
+      name: app_tracking_transparency
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1+1"
   appsflyer_sdk:
     dependency: "direct main"
     description:
@@ -100,7 +107,7 @@ packages:
     source: hosted
     version: "1.0.3"
   firebase_analytics_web:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: firebase_analytics_web
       url: "https://pub.dartlang.org"

@@ -15,13 +15,28 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.fascode.ads.attribution</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>attributable</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>We can collect your advertising id to optimize the ads you will see.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

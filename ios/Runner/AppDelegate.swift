@@ -9,22 +9,39 @@ import AppsFlyerLib
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
-    let batteryChannel = FlutterMethodChannel(name: "com.fascode.attributable/push",
+    let pushChannel = FlutterMethodChannel(name: "com.fascode.attributable/push",
                                               binaryMessenger: controller.binaryMessenger)
-    batteryChannel.setMethodCallHandler({
+    pushChannel.setMethodCallHandler({
       (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
         if call.method == "measureUninstall" {
             // iOS 10 support
             if #available(iOS 10, *) {
               UNUserNotificationCenter.current().requestAuthorization(options:[.badge, .alert, .sound]){ (granted, error) in }
               application.registerForRemoteNotifications()
-            } else if #available(iOS 8, *), #available(iOS 9, *) {
+            } else {
               UIApplication.shared.registerUserNotificationSettings(UIUserNotificationSettings(types: [.badge, .sound, .alert], categories: nil))
               UIApplication.shared.registerForRemoteNotifications()
             }
             result(true)
         }
     })
+    
+    let attChannel = FlutterMethodChannel(name: "com.fascode.attributable/att",
+                                              binaryMessenger: controller.binaryMessenger)
+    attChannel.setMethodCallHandler({
+        (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+        if call.method == "waitForATTUserAuthorization" {
+            let timeoutSec = call.arguments as? Double ?? 60.0
+            if #available(iOS 14, *) {
+                AppsFlyerLib.shared().waitForATTUserAuthorization(timeoutInterval: timeoutSec)
+                NSLog("AppsFlyerLib.waitForATTUserAuthorization: \(timeoutSec)")
+                result(true)
+            } else {
+                result(false)
+            }
+        }
+    })
+    
     
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
